@@ -16,9 +16,12 @@ jobs:
       - name: Test code
         run: npm run test
 
+  #Here, we have used outputs  
   build:
     needs: test
     runs-on: ubuntu-latest
+    outputs:
+      vasuscript: ${{ steps.vasupublish.outputs.scriptfilename }}
     steps:
       - name: Get code
         uses: actions/checkout@v3
@@ -26,12 +29,18 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+
+      - name: Publish JS filename
+        id: vasupublish
+        run: find dist/assets/*.js -type f -execdir echo 'scriptfilename={}' >> $GITHUB_OUTPUT ';'
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: vasuartifacts
           path: vasu
 
+  #In this job, we have used "needs" context and gets the output of previous job.
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -42,5 +51,7 @@ jobs:
           name: vasuartifacts
       - name: list the artifacts
         run: ls
+      - name: using outputs
+        run: echo ${{ needs.build.outputs.vasuscript }}
       - name: Deploy
         run: echo "Deploying..."
