@@ -20,7 +20,7 @@ jobs:
         with:
           name: vasuartifacts
           path: |
-            dist
+            C:\Users\DELL\Desktop\Github\Fourth_Project_Data
             vasudist
   build:
     needs: test
